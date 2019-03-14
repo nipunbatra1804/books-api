@@ -1,0 +1,36 @@
+{
+  "name": "books-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "eslint-plugin-prettier": "^3.0.1",
+    "express": "^4.16.4",
+    "prettier": "^1.16.4"
+  },
+  "devDependencies": {
+    "jest": "^24.5.0",
+    "nodemon": "^1.18.10",
+    "supertest": "^4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nipunbatra1804/books-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nipunbatra1804/books-api/issues"
+  },
+  "homepage": "https://github.com/nipunbatra1804/books-api#readme"
+}
