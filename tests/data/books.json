@@ -1,0 +1,26 @@
+[
+  {
+    "id": "123",
+    "name": "LOTR",
+    "author": "JRRTolkein",
+    "genre": "Fantasy",
+    "price": "100",
+    "quantity": "34"
+  },
+  {
+    "id": "124",
+    "name": "harry",
+    "author": "rowling",
+    "genre": "Fantasy",
+    "price": "102",
+    "quantity": "34"
+  },
+  {
+    "id": "125",
+    "name": "kane&abel",
+    "author": "archer",
+    "genre": "drama",
+    "price": "104",
+    "quantity": "34"
+  }
+]
