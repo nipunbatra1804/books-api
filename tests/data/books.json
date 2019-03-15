@@ -16,6 +16,14 @@
     "quantity": "34"
   },
   {
+    "id": "128",
+    "name": "beasts",
+    "author": "rowling",
+    "genre": "action",
+    "price": "102",
+    "quantity": "34"
+  },
+  {
     "id": "125",
     "name": "kane&abel",
     "author": "archer",

@@ -33,20 +33,14 @@ describe("/books get", () => {
   });
 });
 
-const payload = {
-  check: true
-};
-
-const token = jwt.sign(payload, config.secret, {
-  expiresIn: 1440 // expires in 24 hours
-});
+const token = "Bearer my-awesome-token";
 
 describe("/books post", () => {
   test("should add a  books", done => {
     const path = "/books";
     return request(app)
       .post(path)
-      .set("access-token", token)
+      .set("Authorization", token)
       .send({
         name: "LOTR",
         author: "JRRTolkein",
@@ -72,7 +66,7 @@ describe("/books put", () => {
     const path = "/books/123";
     return request(app)
       .put(path)
-      .set("access-token", token)
+      .set("Authorization", token)
       .send({
         name: "LOTR",
         author: "JRRTolkein",
@@ -91,5 +85,44 @@ describe("/books put", () => {
         });
         done();
       });
+  });
+
+  test("should NOT put", done => {
+    const path = "/books/123";
+    request(app)
+      .put(path)
+      .send({
+        name: "LOTR",
+        author: "JRRTolkein",
+        genre: "Fantasy",
+        price: "124",
+        id: "123"
+      })
+      .expect(403, done);
+  });
+});
+
+describe("/books delete", () => {
+  test("should update a books", done => {
+    const path = "/books/123";
+    return request(app)
+      .delete(path)
+      .set("Authorization", token)
+      .expect(202, done);
+  });
+
+  test("should not be able to delete a book", done => {
+    const path = "/books/123";
+    return request(app)
+      .delete(path)
+      .expect(403, done);
+  });
+
+  test("should not find a book", done => {
+    const path = "/books/800";
+    return request(app)
+      .delete(path)
+      .set("Authorization", token)
+      .expect(404, done);
   });
 });
