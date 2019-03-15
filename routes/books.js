@@ -36,7 +36,7 @@ router.route("/").get((req, res) => {
   } else {
     const keys = Object.keys(query);
     const filteredBooks = books.filter(
-      book => keys.some(key => book[key] === query[key])//OR
+      book => keys.some(key => book[key] === query[key]) //OR
       // keys.every(key => book[key] === query[key])//AND
     );
     res.status(200);
@@ -68,13 +68,13 @@ protectedRouter
   })
   .delete((req, res) => {
     const id = req.params.id;
-    let foundBook = books.find(elem => elem.id === id);
-    if (!foundBook) {
+    let foundBookIndex = books.findIndex(elem => elem.id === id);
+    if (foundBookIndex === -1) {
       res.status(404);
       res.send();
+      return;
     }
-    let filteredBooks = books.filter(elem => elem.id !== id);
-    Object.assign(books, filteredBooks);
+    books.splice(foundBookIndex, 1);
     res.status(202);
     res.send();
   });
