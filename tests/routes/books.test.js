@@ -24,12 +24,12 @@ describe("/books get", () => {
       });
   });
 
-  test("should get list of books of genre fantasy", async () => {
+  test("should get list of books of genre fantasy", done => {
     const path = "/books?genre=Fantasy";
-    await request(app)
+    request(app)
       .get(path)
-      .expect(200)
-      .expect(res => hasCorrectAttributes(res, "genre", "Fantasy"));
+      .expect(res => hasCorrectAttributes(res, "genre", "Fantasy"))
+      .end(done);
   });
 });
 
