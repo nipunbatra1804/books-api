@@ -1,6 +1,5 @@
 [
   {
-    "id": "123",
     "name": "LOTR",
     "author": "JRRTolkein",
     "genre": "Fantasy",
@@ -8,7 +7,6 @@
     "quantity": "34"
   },
   {
-    "id": "124",
     "name": "harry",
     "author": "rowling",
     "genre": "Fantasy",
@@ -16,7 +14,6 @@
     "quantity": "34"
   },
   {
-    "id": "128",
     "name": "beasts",
     "author": "rowling",
     "genre": "action",
@@ -24,7 +21,6 @@
     "quantity": "34"
   },
   {
-    "id": "125",
     "name": "kane&abel",
     "author": "archer",
     "genre": "drama",

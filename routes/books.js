@@ -4,103 +4,109 @@ const protectedRouter = express.Router();
 const uuidv1 = require("uuid/v1");
 const config = require("../config/config");
 const jwt = require("jsonwebtoken");
+
 const books = require("../tests/data/books.json");
+const Book = require("../models/book");
 
 const token = "Bearer my-awesome-token";
 const verifyToken = (req, res, next) => {
-  // check header for the token
-  const recvdtoken = req.headers["authorization"];
+    // check header for the token
+    const recvdtoken = req.headers["authorization"];
 
-  // decode token
-  if (recvdtoken) {
-    if (recvdtoken === token) {
-      next();
+    // decode token
+    if (recvdtoken) {
+        if (recvdtoken === token) {
+            next();
+        } else {
+            res.status(401);
+        }
     } else {
-      res.status(401);
+        // if there is no token
+        res.status(403);
+        res.send({
+            message: "No token provided."
+        });
     }
-  } else {
-    // if there is no token
-    res.status(403);
-    res.send({
-      message: "No token provided."
-    });
-  }
 };
 
 protectedRouter.use(verifyToken);
 
 router.route("/").get((req, res) => {
-  const query = req.query;
-  if (Object.entries(query).length === 0) {
-    res.json(books);
-  } else {
-    const keys = Object.keys(query);
-    const filteredBooks = books.filter(
-      book => keys.some(key => book[key] === query[key]) //OR
-      // keys.every(key => book[key] === query[key])//AND
-    );
-    res.status(200);
-    res.json(filteredBooks);
-  }
+    const { query } = req;
+
+    if (Object.entries(query).length === 0) {
+        Book.find()
+            .then(response => res.json(response))
+            .catch(err => res.status(401).end());
+    } else {
+        Book.find(query)
+            .then(response => res.json(response))
+            .catch(err => res.status(401).end());
+    }
 });
 
 protectedRouter.route("/").post((req, res) => {
-  const book = req.body;
-  book.id = uuidv1();
-  books.push(book);
-  res.status(201);
-  res.json(book);
+    const book = new Book(req.body);
+    book.save((err, book) => {
+        if (err) {
+            res.status(500).end();
+            return;
+        }
+        res.status(201).json(book);
+    });
 });
 
 protectedRouter
-  .route("/:id")
-  .put((req, res) => {
-    const id = req.params.id;
-    const book = req.body;
-    let foundBook = books.find(elem => elem.id === id);
-    if (!foundBook) {
-      res.status(404);
-      res.end();
-    }
-    foundBook = book;
-    res.status(202);
-    res.json(foundBook);
-  })
-  .delete((req, res) => {
-    const id = req.params.id;
-    let foundBookIndex = books.findIndex(elem => elem.id === id);
-    if (foundBookIndex === -1) {
-      res.status(404);
-      res.send();
-      return;
-    }
-    books.splice(foundBookIndex, 1);
-    res.status(202);
-    res.send();
-  });
+    .route("/:_id")
+    .put((req, res) => {
+        const { _id } = req.params;
+        const book = req.body;
+
+        return Book.findByIdAndUpdate(
+            _id,
+            req.body,
+            { new: true, runValidators: true },
+            (err, book) => {
+                if (!err) return res.status(202).json(book);
+            }
+        );
+    })
+    .delete((req, res) => {
+        const { _id } = req.params;
+        return Book.findByIdAndDelete(_id, (err, book) => {
+            if (!err) {
+                if (!book) {
+                    return res.sendStatus(404);
+                }
+                return res.status(202).json(book);
+            }
+
+            return res.status(404).send();
+        });
+    });
 module.exports = { router, protectedRouter };
 
 function jwtMw(req, res, next) {
-  // check header for the token
-  var token = req.headers["access-token"];
+    // check header for the token
+    var token = req.headers["access-token"];
 
-  // decode token
-  if (token) {
-    // verifies secret and checks if the token is expired
-    jwt.verify(token, config.secret, (err, decoded) => {
-      if (err) {
-        return res.json({ message: "invalid token" });
-      } else {
-        // if everything is good, save to request for use in other routes
-        req.decoded = decoded;
-        next();
-      }
-    });
-  } else {
-    // if there is no token
+    // decode token
+    if (token) {
+        // verifies secret and checks if the token is expired
+        jwt.verify(token, config.secret, (err, decoded) => {
+            if (err) {
+                return res.json({ message: "invalid token" });
+            } else {
+                // if everything is good, save to request for use in other routes
+                req.decoded = decoded;
+                next();
+            }
+        });
+    } else {
+        // if there is no token
 
-    res.send({
-      message: "No token provided."
-    });
-  }
+        res.send({
+            message: "No token provided."
+        });
+    }
 }

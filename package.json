@@ -12,18 +12,23 @@
   "scripts": {
     "start": "NODE_ENV=production node server.js",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:watch": "jest --watch --config ./tests/jest-config.json",
     "dev": "NODE_ENV=dev nodemon server.js"
   },
   "dependencies": {
     "eslint-plugin-prettier": "^3.0.1",
     "express": "^4.16.4",
     "jsonwebtoken": "^8.5.0",
+    "mongoose": "^5.4.19",
     "prettier": "^1.16.4",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "eslint": "^5.15.3",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0",
     "jest": "^24.5.0",
+    "mongodb-memory-server": "^4.2.1",
     "nodemon": "^1.18.10",
     "supertest": "^4.0.0"
   },
