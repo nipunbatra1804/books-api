@@ -2,11 +2,13 @@ const app = require("./app");
 const mongoose = require("mongoose");
 const inDevEnv = process.env.NODE_ENV === "dev";
 
-inDevEnv && require("dotenv").config();
+if (inDevEnv) {
+    require("dotenv").config();
+}
 
 const mongodbUri = process.env.MONGODB_URI;
-
 const port = process.env.PORT;
+console.log(mongodbUri);
 mongoose.connect(mongodbUri);
 const db = mongoose.connection;
 
