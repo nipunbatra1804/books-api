@@ -124,14 +124,18 @@ describe("/books post", () => {
             .set("Authorization", token)
             .send({
                 name: "LOTR",
-                author: "JRRTolkein"
+                author: "JRRTolkein",
+                genre: "Fantasy",
+                price: 124
             })
             .expect(201);
 
         expect(res.body).toEqual(
             expect.objectContaining({
                 name: "LOTR",
-                author: "JRRTolkein"
+                author: "JRRTolkein",
+                genre: "Fantasy",
+                price: 124
             })
         );
         const book = await Book.findOne({ name: "LOTR" });
@@ -166,7 +170,7 @@ describe("/books put", () => {
         db = mongoose.connection;
     });
 
-    test("should update a books", async () => {
+    test("should update a books", async done => {
         const { _id } = await Book.findOne({ name: "harry" });
         const path = `/books/${_id}`;
         await request(app)
@@ -179,18 +183,16 @@ describe("/books put", () => {
                 price: "124",
                 quantity: "21"
             })
-            .expect(202)
-            .then(res => {
-                expect(res.body).toEqual(
-                    expect.objectContaining({
-                        name: "harry",
-                        author: "JK rowling",
-                        genre: "Fantasy",
-                        price: 124,
-                        _id: expect.any(String)
-                    })
-                );
-            });
+            .expect(202);
+
+        const book = await Book.findOne({ name: "harry" });
+        expect(book).toEqual(
+            expect.objectContaining({
+                name: "harry",
+                author: "JK rowling"
+            })
+        );
+        done();
     });
 
     test("should NOT put", async done => {

@@ -1,11 +1,13 @@
 const app = require("./app");
 const mongoose = require("mongoose");
-const port = process.env.PORT || 8080;
+const inDevEnv = process.env.NODE_ENV === "dev";
 
-inDevEnv = process.env.NODE_ENV === "dev";
+inDevEnv && require("dotenv").config();
 
-//connect to db
-mongoose.connect("mongodb://localhost:27017/books-db");
+const mongodbUri = process.env.MONGODB_URI;
+
+const port = process.env.PORT;
+mongoose.connect(mongodbUri);
 const db = mongoose.connection;
 
 db.on("error", () => {

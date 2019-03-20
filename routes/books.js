@@ -33,7 +33,6 @@ protectedRouter.use(verifyToken);
 
 router.route("/").get((req, res) => {
     const { query } = req;
-
     if (Object.entries(query).length === 0) {
         Book.find()
             .then(response => res.json(response))
@@ -62,12 +61,23 @@ protectedRouter
         const { _id } = req.params;
         const book = req.body;
 
-        return Book.findByIdAndUpdate(
-            _id,
+        return Book.replaceOne(
+            { _id },
             req.body,
             { new: true, runValidators: true },
             (err, book) => {
                 if (!err) return res.status(202).json(book);
+                return res.sendStatus(400);
+            }
+        );
+
+        return Book.findOneAndUpdate(
+            { _id },
+            req.body,
+            { new: true, runValidators: true },
+            (err, book) => {
+                if (!err) return res.status(202).json(book);
+                return res.sendStatus(400);
             }
         );
     })
