@@ -2,6 +2,10 @@ const app = require("./app");
 const mongoose = require("mongoose");
 const inDevEnv = process.env.NODE_ENV === "dev";
 
+mongoose.set("useCreateIndex", true);
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useFindAndModify", false);
+
 if (inDevEnv) {
     require("dotenv").config();
 }

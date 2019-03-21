@@ -18,10 +18,11 @@
     "dev:db": "npm run start:db & npm run dev"
   },
   "dependencies": {
+    "bcrypt": "^3.0.5",
     "dotenv": "^7.0.0",
     "eslint-plugin-prettier": "^3.0.1",
     "express": "^4.16.4",
-    "jsonwebtoken": "^8.5.0",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.4.19",
     "prettier": "^1.16.4",
     "uuid": "^3.3.2"

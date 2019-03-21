@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const request = require("supertest");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -5,9 +7,12 @@ const app = require("../../app");
 const books = require("../data/books.json");
 const config = require("../../config/config");
 const Book = require("../../models/book");
+const User = require("../../models/user");
 // eslint-disable-next-lines no-undef
 const { MongoMemoryServer } = require("mongodb-memory-server");
-
+mongoose.set("useCreateIndex", true);
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useFindAndModify", false);
 function hasCorrectAttributes(res, property, val) {
     const { body } = res;
     if (body.every(elem => elem[property] === val)) {
@@ -102,7 +107,12 @@ const token = "Bearer my-awesome-token";
 
 describe("/books post", () => {
     let mongoServer;
-    let db;
+    let db, token;
+    const dummyUser = {
+        username: "aabb",
+        password: "pskpsk"
+    };
+
     beforeAll(async () => {
         // connect to db
         mongoServer = new MongoMemoryServer();
@@ -110,6 +120,15 @@ describe("/books post", () => {
         await mongoose.connect(mongoUri, err => {
             if (err) console.error(err);
         });
+        await request(app)
+            .post("/register")
+            .send(dummyUser);
+
+        token = await request(app)
+            .get("/token")
+            .send(dummyUser)
+            .expect(200)
+            .then(res => res.body.token);
     });
 
     afterAll(async () => {
@@ -119,9 +138,10 @@ describe("/books post", () => {
 
     test("should add a  books", async done => {
         const path = "/books";
+
         const res = await request(app)
             .post(path)
-            .set("Authorization", token)
+            .set("access-token", token)
             .send({
                 name: "LOTR",
                 author: "JRRTolkein",
@@ -150,7 +170,12 @@ describe("/books post", () => {
 });
 
 describe("/books put", () => {
-    let mongoServer;
+    let mongoServer, token;
+
+    const dummyUser = {
+        username: "aabb",
+        password: "pskpsk"
+    };
     beforeAll(async () => {
         // connect to db
         mongoServer = new MongoMemoryServer();
@@ -158,6 +183,16 @@ describe("/books put", () => {
         await mongoose.connect(mongoUri, err => {
             if (err) console.error(err);
         });
+
+        await request(app)
+            .post("/register")
+            .send(dummyUser);
+
+        token = await request(app)
+            .get("/token")
+            .send(dummyUser)
+            .expect(200)
+            .then(res => res.body.token);
     });
 
     afterAll(async () => {
@@ -175,7 +210,7 @@ describe("/books put", () => {
         const path = `/books/${_id}`;
         await request(app)
             .put(path)
-            .set("Authorization", token)
+            .set("access-token", token)
             .send({
                 name: "harry",
                 author: "JK rowling",
@@ -211,7 +246,7 @@ describe("/books put", () => {
     });
 });
 
-describe("/books delete", () => {
+xdescribe("/books delete", () => {
     let mongoServer;
     beforeAll(async () => {
         // connect to db
