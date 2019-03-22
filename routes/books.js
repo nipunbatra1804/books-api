@@ -11,60 +11,22 @@ const User = require("../models/user");
 
 const token = "Bearer my-awesome-token";
 
-function jwtMw(req, res, next) {
-    // check header for the token
-    var token = req.headers["access-token"];
-
-    // decode token
-    if (token) {
-        // verifies secret and checks if the token is expired
-        jwt.verify(
-            token,
-            process.env.SUPER_SECRET_KEY,
-            async (err, decoded) => {
-                if (err) {
-                    return res.json({ message: "invalid token" });
-                } else {
-                    // if everything is good, save to request for use in other routes
-
-                    console.log(decoded);
-                    const user = await User.findById(decoded);
-                    if (!user) {
-                        return res.status(400).send("Fishy User");
-                    }
-                    next();
-                }
-            }
-        );
-    } else {
-        // if there is no token
-        res.status(403);
-        res.send({
-            message: "No token provided."
-        });
-    }
-}
-
 const verifyToken = async (req, res, next) => {
-    // check header for the token
-    jwtMw(req, res, next);
-    return;
+    // verifies secret and checks if the token is expired
+    try {
+        console.log(process.env.SUPER_SECRET_KEY);
+        const verify = await jwt.verify(
+            req.headers["access-token"],
+            process.env.SUPER_SECRET_KEY
+        );
+        if (verify) {
+            console.log(verify);
 
-    const recvdtoken = req.headers["authorization"];
-
-    // decode token
-    if (recvdtoken) {
-        if (recvdtoken === token) {
-            next();
-        } else {
-            res.status(401);
+            return next();
         }
-    } else {
-        // if there is no token
-        res.status(403);
-        res.send({
-            message: "No token provided."
-        });
+        throw new Error("unable to verify");
+    } catch (err) {
+        return res.status(403).send(err.message);
     }
 };
 

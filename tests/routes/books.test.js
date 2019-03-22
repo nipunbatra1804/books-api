@@ -1,13 +1,12 @@
 require("dotenv").config();
 
 const request = require("supertest");
-const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const app = require("../../app");
 const books = require("../data/books.json");
 const config = require("../../config/config");
 const Book = require("../../models/book");
-const User = require("../../models/user");
+
 // eslint-disable-next-lines no-undef
 const { MongoMemoryServer } = require("mongodb-memory-server");
 mongoose.set("useCreateIndex", true);
@@ -20,6 +19,13 @@ function hasCorrectAttributes(res, property, val) {
     }
     throw new Error("faulty");
 }
+
+jest.mock("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+
+jest.mock("../../models/user");
+const User = require("../../models/user");
+
 describe("/books get", () => {
     let mongoServer;
     let db;
@@ -120,28 +126,22 @@ describe("/books post", () => {
         await mongoose.connect(mongoUri, err => {
             if (err) console.error(err);
         });
-        await request(app)
-            .post("/register")
-            .send(dummyUser);
-
-        token = await request(app)
-            .get("/token")
-            .send(dummyUser)
-            .expect(200)
-            .then(res => res.body.token);
     });
 
     afterAll(async () => {
         mongoose.disconnect();
         await mongoServer.stop();
     });
+    afterEach(async () => {
+        jwt.verify.mockReset();
+    });
 
-    test("should add a  books", async done => {
+    test("should add a books", async done => {
         const path = "/books";
-
+        jwt.verify.mockResolvedValue({});
         const res = await request(app)
             .post(path)
-            .set("access-token", token)
+            .set("access-token", "rubbish")
             .send({
                 name: "LOTR",
                 author: "JRRTolkein",
@@ -183,16 +183,6 @@ describe("/books put", () => {
         await mongoose.connect(mongoUri, err => {
             if (err) console.error(err);
         });
-
-        await request(app)
-            .post("/register")
-            .send(dummyUser);
-
-        token = await request(app)
-            .get("/token")
-            .send(dummyUser)
-            .expect(200)
-            .then(res => res.body.token);
     });
 
     afterAll(async () => {
@@ -205,12 +195,17 @@ describe("/books put", () => {
         db = mongoose.connection;
     });
 
+    afterEach(async () => {
+        jwt.verify.mockReset();
+    });
+
     test("should update a books", async done => {
         const { _id } = await Book.findOne({ name: "harry" });
+        jwt.verify.mockResolvedValue({});
         const path = `/books/${_id}`;
         await request(app)
             .put(path)
-            .set("access-token", token)
+            .set("access-token", "")
             .send({
                 name: "harry",
                 author: "JK rowling",
@@ -232,6 +227,7 @@ describe("/books put", () => {
 
     test("should NOT put", async done => {
         const { _id } = await Book.findOne({ name: "harry" });
+        jwt.verify.mockRejectedValue({});
         const path = `/books/${_id}`;
         request(app)
             .put(path)
@@ -246,7 +242,7 @@ describe("/books put", () => {
     });
 });
 
-xdescribe("/books delete", () => {
+describe.skip("/books delete", () => {
     let mongoServer;
     beforeAll(async () => {
         // connect to db
